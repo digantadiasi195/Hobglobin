@@ -10,13 +10,13 @@ rag = RAGPipeline()
 class ChatRequest(BaseModel):
     query: str
 
-@app.get("/fine-prints")
-async def get_fine_prints():
-    try:
-        fine_prints = rag.generate_fine_prints()
-        return {"fine_prints": fine_prints}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# @app.get("/fine-prints")
+# async def get_fine_prints():
+#     try:
+#         fine_prints = rag.generate_fine_prints()
+#         return {"fine_prints": fine_prints}
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/chat")
 async def chat(request: ChatRequest):
