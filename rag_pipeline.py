@@ -2,16 +2,17 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 import google.generativeai as genai
 from dotenv import load_dotenv
+import os
 
 class RAGPipeline:
     def __init__(self):
         load_dotenv()
-        # self.api_key = os.getenv("GEMINI_API_KEY")
-        # genai.configure(api_key=self.api_key)
-        # self.model = genai.GenerativeModel("gemini-1.5-flash")
-        # # Use HuggingFaceEmbeddings from langchain-huggingface
-        # self.embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
-        # self.vector_store = self._build_vector_store()
+        self.api_key = os.getenv("GEMINI_API_KEY")
+        genai.configure(api_key=self.api_key)
+        self.model = genai.GenerativeModel("gemini-1.5-flash")
+        # Use HuggingFaceEmbeddings from langchain-huggingface
+        self.embedding_model = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")
+        self.vector_store = self._build_vector_store()
 
     def _extract_text_from_pdf(self, pdf_path):
         with open(pdf_path, "rb") as file:
@@ -23,15 +24,11 @@ class RAGPipeline:
 
     def _build_vector_store(self):
         data_folder = "data"
-        documents = []
-        for filename in os.listdir(data_folder):
-            if filename.endswith(".pdf"):
-                text = self._extract_text_from_pdf(os.path.join(data_folder, filename))
-                print(text)
-                documents.append(Document(page_content=text, metadata={"source": filename}))
+        loader = PyPDFLoader(data_folder)
+        documents = loader.load()
+        print(documents)
         
-        # Pass the HuggingFaceEmbeddings instance to FAISS
-        return FAISS.from_documents(documents, self.embedding_model)
+        pass
 
     def generate_fine_prints(self):
         context = "\n".join([doc.page_content for doc in self.vector_store.docstore._dict.values()])
